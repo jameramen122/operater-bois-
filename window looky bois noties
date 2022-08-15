@@ -1,1 +1,51 @@
+---WSMAN---
+<oh really? O.o *sweats*>
+get-item WSMAN:\localhost\client\trustedhost
+
+queries the trusted host
+
+
+(get-item WSMAN:\localhost\client\trustedhost).values
+
+gets the info on the trusted hosts
+
+
+get-item WSMAN:\localhost\client\trustedhost -value "10.2.0.8,notchyna.ch" -concatenate
+
+queries a very particular field in this, without concatenate it overwrites the old file/ A URL, or an IP can be used for the value field. :3
+
+
+
+
+---invoke-command---
+
+invoke-command -computername pwnd_host { restart-computer -force } -AsJob
+#this command runs a command on a different computer in your same network
+
+receve-job 1
+#receves job info based off of jobs.
+
+invoke-command -computername workstation3,server4,webserver5 C:\windows\fondevil.ps1
+#sends the ps1 file to each of the selected computers then runs it, sending the ouput back to the screen after the scripts run.
+
+New-PSSession -computername <the computers name>
+#gets a powershell session on another computer, its like ssh-ing into a unix computer.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
