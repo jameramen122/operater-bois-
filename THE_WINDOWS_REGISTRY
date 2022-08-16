@@ -1,0 +1,69 @@
+
+
+============================================ T H E   W I N D O W S   R E G I S T R Y ===================================================
+
+hive keys are like root directorys or a rolladex
+  under that are regestry keys, or sub-key, like a directory in a directory. a key can be a sub-key/ hive keys cannot.
+    in the subkey there are actual entrys in the regestry. a 'regestry value' as windows calls it. I call it a 'reg entry'
+
+when opened as admin you can see everything, normal
+
+hkey_classes_root --> the classes root is a symbolic link under   'computer\hkey_local_machine\software\classes'
+hkey_current_user --> a symbolic link made by the session ID to make a link into the HK_users for quick access.
+hkey_Local_Machine --> holds all system\machine spesific settings.
+ |> BCD00000000 ---> boot config for windows.
+ |> Hardware --> drivers and shit
+ |> SAM --> security account manager/ local login account authenticator. CANNOT BE ACCESSED BY NORMAL\ADMIN MEANS
+ |> Security --> LSAS uses this, settings and configuration for Local Security accessability system
+ |> Software --> system wide software. 
+ |> System --> startup configuration boot-->drivers
+hkey_Users --> holds all user profiles and settings, including admins 18, 19, 20. domain controller sid is 500. Users start at 1000 
+ |> S-1-5-18 --> local system C:\windows\system32\config\"the files are here!"
+ |> S-1-5-19 --> local service 'not veiw-able in C:\ gui. Stored on the physical drive in 1's and 0's.'
+ |> S-1-5-20 --> local network 'not veiw-able in C:\ gui. Stored on the physical drive in 1's and 0's'.
+ |> S-1-5-21-556451121486-12165198132-31215616556-1001 --> the three long numbeers are fake, but this is a normal user. the .dat file is what this is.
+ |> S-1-5-21-556451121486-12165198132-31215616556-1001_classes --> the system config info on user 1001  'C:\users\andy.dwyer\NTUSER.DAT' :3
+hkey_Current_Config --> current configuration that is loaded and running
+
+---ren---
+short for re-name 
+can be used to change the name and extension of a file
+in the regestry you can add\remove\change what file extensions read as.
+
+---making a change to extensions---
+"i'll figure this out later! i might not need it yet."
+<incomplete?> new-ItemProperty "hklm:\software\classes" -Name ".fuk" -Force -ErrorAction Silentlycontinue | out-Null
+<incomplete> -value 'exefile' -Force -ErrorAction Silentlycontinue | out-Null
+<incomplete> -string  -value 'application/x-msdownload' -Force -ErrorAction Silentlycontinue | out-Null
+
+
+=================================== M A N I P U L A T I N G   T H E   R E G I S T R Y =============================================
+
+new keys can be made is regedit real easy. just right click\ new key\ call it whatever\ right click\ new value\'string value, binary value, DWORD, other things!'
+
+binary asks for binary, DUH!
+
+dword asks for a hex or a decimal value. max length is 32 bits, double word 0xffffffff (4294967295) {dword stands for double word. as in bit size.}
+qword same as dword, but it can hold a LOT more, quad word 0xffff ffff ffff ffff (1.8446744e+19)
+
+
+---query--
+
+get-item HKLM:\ ---> displays the Hivekey HKLM
+get-childitem HKLM:\*\ --> displays all subdirectorys\subkeys of HKLM:\
+Get-childitem -r HKLM:\ --> recursivly displays everything it can under HKLM:\
+
+set-itemproperty -path HKLM:\software\microsoft\windows\currentversion\run\ -Name malwar -value "im_innocent! >:3" --> sets malwar to run at computer starts up
+set-itemproperty -path HKLM:\software\microsoft\windows\currentversion\run\ -Name malwar -value "im_innocent_pls_no_delete_me!" -force --> when a regkey already exist it can overwrite with -force.
+
+the same can be done to HKCU
+HKU cannot be mounted as a file, mount it as a registry
+to do this to HK_Users, get-psdrive, new-psdrive -name HKU -psprovider registry -root HKey_Users
+add-content -value "new-psdrive -name HKU -psprovider registry -root HKey_Users" $Profile.AllUsersAllHosts --> makes change perminent
+&$Profile.AllUsersAllHosts --> to reload it
+get-item -path HKU:\*\software\microsoft\windows\currentversion\run --> to check to see if you made these changes correctly.
+or
+instead of making a new drive
+get-item -path registry::HKEY_Users\*\software\microsoft\windows\currentversion\run
+
+
