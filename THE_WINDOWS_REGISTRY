@@ -74,5 +74,46 @@ adding a thingy that changes the utilman.exe that opens a command prompt.
 clicking the EASE OF ACCESS on the login screen opens a cmd prompt.
 then you can access the SAM and shit and change passwords. shits crazy.
 
+============================================ T H E   N T F S   S Y S T E M ==============================================================
+
+windows and unix made this at the same time.
+the reasons a new one is not out;
+lazy developers
+there is no reason to break NTFS,
+re-fs is a thing, but it cost money... and a lot of jank powershell shit
+
+before NTFS there was FAT, the File Allocation Table.
+which can hold 4 ENTIRE file partitions
+E-FAT and FAT32 can hold more but there not as good as NTFS.
+NTFS allows up to 26 primary partition on one drive.
+NTFS also added alternet data stream. --> Gui's can't see them. so you have to use cmd and shit.
+If the drive is full --> NTFS will overwrite what hasn't been used in a while.
+when it overwrites too much the kernel will shit itself and cri and the server will crash. :3
+
+
+============================================ T H E   A L T E R N A T E   D A T A S T R E A M ==============================================================
+in cmd
+echo "hehehehehehe, alternate datastreams go BRRRRRRT" > "Notepad++.lnk":im_not_here.txt
+this is a thing only on NTFS, Alternate datastrings. a way to have a file in the space alocated on the disk for a file.
+
+but in powershell its hell. get-childitem -force dosen't get the files
+get-item ./calc.fuk -stream *
+with this it will show the alternate streams.
+
+get-content .\calc.fuk -stream truth.txt --> reads the file from datastream
+gci C:\ -force -Recurse -erroraction silentlycontinue | %
+
+## T E S T ? ##
+Get-ChildItem $pwd | ForEach-object { Get-Item $_.fullname -stream * } | where { $_.stream -ne ':$DATA' } | Get-Content
+## T E S T ? ##
+
+
+========================================================================================================================================================
+
+phishy time
+
+
+gci -force | where -Property Length -ne 0 | gc
+
 
 
