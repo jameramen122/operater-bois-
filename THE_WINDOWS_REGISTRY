@@ -67,3 +67,12 @@ instead of making a new drive
 get-item -path registry::HKEY_Users\*\software\microsoft\windows\currentversion\run
 
 
+---aaaa----
+
+Set-MpPreference -DisableRealTimeMonitoring $True --> use this to unset the realtimemonitoring
+adding a thingy that changes the utilman.exe that opens a command prompt.
+clicking the EASE OF ACCESS on the login screen opens a cmd prompt.
+then you can access the SAM and shit and change passwords. shits crazy.
+
+
+
