@@ -31,14 +31,20 @@ invoke-command -computername workstation3,server4,webserver5 C:\windows\fondevil
 New-PSSession -computername <the computers name>
 #gets a powershell session on another computer, its like ssh-ing into a unix computer.
 
+---ren---
+short for re-name 
+can be used to change the name and extension of a file
+
+
+============================================ T H E   W I N D O W S   R E G I S T R Y ===================================================
+
+hive keys are like root directorys or a rolladex
+  under that are regestry keys, or sub-key, like a directory in a directory. a key can be a sub-key/ hive keys cannot.
+    in the subkey there are actual entrys in the regestry. a 'regestry value' as windows calls it. I call it a 'reg entry'
 
 
 
-
-
-
-
-
+hkey_classes_root --> the classes root is a symbolic link under   'computer\hkey_local_machine\software\classes'
 
 
 
