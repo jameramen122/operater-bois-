@@ -50,6 +50,25 @@ hkey_classes_root --> the classes root is a symbolic link under   'computer\hkey
 
 
 
+============================================ T H E   N T F S  S Y S T E M ==============================================================
+
+windows and unix made this at the same time.
+the reasons a new one is not out;
+lazy developers
+there is no reason to break NTFS,
+re-fs is a thing, but it cost money... and a lot of jank powershell shit
+
+before NTFS there was FAT, the File Allocation Table.
+which can hold 4 ENTIRE file partitions
+E-FAT and FAT32 can hold more but there not as good as NTFS.
+NTFS allows up to 26 primary partition on one drive.
+NTFS also added alternet data stream. --> Gui's can't see them. so you have to use cmd and shit.
+If the drive is full --> NTFS will overwrite what hasn't been used in a while.
+when it overwrites too much the kernel will shit itself and cri and the server will crash. :3
+
+
+
+
 
 
 
