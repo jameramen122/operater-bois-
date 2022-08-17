@@ -1,1 +1,175 @@
 
+
+======================================================== U N I X   A N D   S T U F F =====================================================================
+
+
+ssh linops --> vim .ssh/config --> the file we made to make loggin in easier --> chmod 600 .
+ps1='$' --> makes the cmd prompt show as a $ and not name@domain:~$ 
+
+
+
+--- ifconfig ---
+this command has be depricated
+is 'ip addr' now
+or use 'ip a' 
+--- route has also been depricated
+use ip r
+--- arp also removed for some reason
+use 'ip neigh' or 'ip n'
+
+--- the help commands ---
+man --> gets the manual of the command listed after
+help --> gets a help page for the command listed after
+apropos --> searches the man pages for a keyword
+whereis --> locate the binary, source, and manual page files for a command
+whereis -b --> locate the binary file for a command
+ssh-keygen --> makes an ssh key dummy
+
+--- netstat ---
+ss -ntlp has replaced it. netstat is depricated
+remove the '-n' to see the ports as their service, not their number.
+sudo ss -ntlp shows the processes that are using the port along with the connection info.
+
+============ question funnies ===============
+ --- who am i? ---
+hostname --> name of the computer
+uname -a --> kernal info, system archetecture
+
+whoami --> username
+id --> displays group id's
+
+ --- what can I do? ---
+ 
+sudo -l --> displays what a user can do 
+ 
+ --- whats going on? ---
+ 
+ 
+w --> everyone thats online
+who -->
+ps -elf --> gets a process list.
+ 
+ --- why is that happening? ---
+ 
+NOT COVERED IN DAY ONE...
+ *dies*
+ 
+ --- how is that happening? ---
+ 
+ --- Whats in the file? ---
+
+if there is a human readable file, whats in it? read it stoopid
+ 
+ 
+ 
+ ========================================================= S O M E   H I S T O R Y ===============================================================
+ 
+ linux is just the kernal
+ 
+ it started with PDP-7... or MULTIX, a giand heavy peice of shit. multiplex interactive something
+ they made Unix... which was better an 1000 different ways. in 1971
+ other people made modifications to this OS and in 1983 some dude made GANU
+ then in 1991 a man named Linus made what is today Linux... he wanted to call it FreeAxe
+ 
+ then in 1992 Debian made a FUCK TON of different things, one of which is names UBUNTU
+ Kali is made off of Debian
+ Ubuntu and redhat had many offshutes.
+ 
+ 
+ ====================================== some more things =================================
+ 
+ you can use 'vim .' to open your diretory listing in vim
+ /usr/bin --> holds your binarys
+ /usr/sbin --> holds your system binarys, requires the sudo to run (/usr/sbin)
+ /usr/local/bin --> holds more if the binarys
+ /home --> the default directory. where a lot of the normal things are.
+ /usr --> universal system resorces. the catch all for everything that wasn't put in a directory.
+ /etc --> the 'everything thats configurable' directory, its like the windows regestry but different.
+ /var --> things that are likely to change, so logs an' shit.
+ /boot --> boot congif files and the boot process files. grub lives here! :3
+ /dev --> the special hardware drivers and shit are here, but ther're not drivers. dev/null our trashcan lives here. the standard in out and err are also here, 
+ /lib --> .dll libraries. nothing too crazy.
+ /mnt --> shows perm attached external drives
+ /media --> removable media. so cd's and shit.
+ /opt --> optional things. a reservation of sorts. when you unpack something or download something this is often used
+ /run --> run time and variable data, holds data based off of the current running computer session
+ /tmp --> tenperarry files, everyone can access this
+ /proc --> process information.
+ 
+ =================================== U S E R S   A N D   G R O U P S ==================================================
+ 
+ /etc/passwd --> holds the user info on every user.
+ <USER NAME>:<PASSWD>:<UID>:<GID>:<comments>:<home path>:<shell path>
+ 
+ --- ls . ---
+ 
+   U  G  O
+ -rw-r--r--
+ or 
+ drwx-rx-rx
+ 
+ 
+ --- SUID ---
+ 
+ The SUID is NOT the sticky bit
+ 
+ the SUID is the
+ 
+ ls -lisa /usr/bin/passwd
+12062 60 -rwsr-xr-x 1 root root 59640 Mar 22  2019 /usr/bin/passwd
+
+the U x bit is an S right now. that is a setting that allows anyuser change the file, but only the entries that are theirs, not anyone elses.
+
+ls -lisa /var/tmp/. 
+ 29638 4 drwxrwxrwt  6 root root 4096 Aug 17 00:06 .
+ 
+ the letter t states that the owner is the only one that can delete it. -->
+ 
+ ---s--s--t
+ and 
+ ---S--S--T
+ 
+ the case of the letter deturmines if the x bit is turned on underneath. >:3
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
