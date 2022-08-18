@@ -119,34 +119,48 @@ Services.exe   Lsass.exe
     V              V              V
 Svchost.exe    Svchost.exe    Svchost.exe
     
-    
+--- pre-boot process ---    
 POST --> does the hardware exist?
 BIOS --> uses MBR, starts the Bootmgr. BIOS is the older version of UEFI.
 UEFI --> uses GPT (global partition table), starts the Bootmgrfw.efi, loaded into flash memory and is much faster. you can update firmware without loading the OS and there is the secure boot. verifys Drivers and ensures if the system has been changed while it is off\not powered on. when Secure boot is enabled, it is protected in almost every way. this is preferd over BIOS.
 MBR --> the master boot record, the first 512 bytes on the driver. points to the Bootmgr.
-bootmgr.exe --> manages what is loaded at startup. 
+bootmgr.exe --> manages what is loaded at startup. bootmgrfw.efi and bootmgr.exe replaced the NTLDR
+  
+--- boot process ---
+boot.ini --> legacy kernal 5, used on win7 and prior.
+BCD --> the Boot Config Datastore, started by bootmgr. starts winload and winresume.exe
+Winload.exe --> 
   -whinresume.exe --> is for hibernation, takes everything in ram, EVERYTHING. and writes it to a disk. it then powers off the machine very slowly. when the system is powered on again. it calls Hiberfil.sys to load the system.
-Winload.exe -->
-
+    |
+    V
+-- os loads --
 Ntoskrnl.exe --> this is the windows Kernal, Winload calls the kernal and from there it takes control.
+it loads the device drivers first, then it loads the HKLM, the windows registry. then the Pagefile.sys (memory swap file)
+after loading the Pagefile, it loads the process manager --> then loads system idle process (its not even a process! >:3) it has an id of 0, name idle, it does not show in task manager, but in earlier versions of win10 it did show, and it said that every field was at 100% usage
+system id 0 is the kernal, dont kill the idle process. please don't. 
+last it loads the HAL DLL
+-- os is loaded --
+    |
+    V
+--- system (pid 4) (session 0 is a system session) ---
+This should be a NON-INTERACTIVE session.
+the start of the logon process. prior to windows NT, only one user could log in at a given time.
+Smss.exe --> Smss creates sessions starting at 0 and increses. its sole reason is to create a logon session
+Csrss.exe --> Client server run time. alows a local machine to call for services from a server that it does not have on the local machine
+wininit.exe --> Windows initalization, starts Lsass.exe and svchost.exe
+Lsass.exe --> user authentication, the only thing that can authenticate to the SAM
+Svchost.exe --> the service that hosts a service. a service requires this to run. or the service would just be a process.
 
-Smss.exe
-Csrss.exe --> starts Wininit.exe and the Winlogon.exe
-
---- wininit.exe ---
-Wininit.exe -->
-Lsass.exe -->
-Services.exe --> loads Svchost.exe, there are many launched
-
-
+--- Smss.exe session 1 (user based session) ---
+This should be an INTERACTIVE session. :3
+Csrss.exe(1) --> starts along with winlogon(1)
+Winlogon.exe(1) --> calls the Logonui(1) and the userinit(1), once an attempt has been made to log in, sends the credentals to Lsass for them to authenticate against the SAM, then Lsass calls back to the Winlogon.exe telling him that its good/or bad.
+Logonui.exe(1) -->  The user Interface for logging in. dies after use. >:3
+Userinit.exe(1) --> when everything is done, it calls the Explorer(1) then Userinit(1) dies and Explorer(1) has a Parent process id of a process that is dead. >:3
+Explorer.exe(1) --> 
 
 
-
---- winlogon.exe ---
-Winlogon.exe -->
-Userinit.exe -->
-Explorer.exe -->
-
+--- extra shits! ---
 coldboot --> (system restarts shut off the entire os)
 hotboot --> (the os stays active as the rest of the machine restarts)
 
