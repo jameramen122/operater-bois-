@@ -67,6 +67,116 @@ If the drive is full --> NTFS will overwrite what hasn't been used in a while.
 when it overwrites too much the kernel will shit itself and cri and the server will crash. :3
 
 
+========================================== T H E   B O O T   P R O C E S S   A N D   B C D E D I T ============================================
+
+
+--- The windows NT 6 boot process with system files. ---
+ 
+   POST --> (does the hardware exist?)
+    |
+    |
+    V
+BIOS/UEFI
+    |
+    |
+    V
+   MBR
+    |
+    |
+    V
+Volume Boot Sector
+    |
+    |
+    V
+Bootmgr(.exe) <--data-- BCD boot config data
+    |
+    |------------------\
+    V                  |
+ Winload            Winresume.exe <--data-- Hiberfil.sys
+    |
+    |
+    V
+Ntoskml.exe
+    |
+    |-----------------------\------------------\------------------\-------------------\------------------\
+    |                       |                  |                  |                   |                  |
+    V                     HAL DLL     Load Directory hive  Load Device Drivers     Process        Start Paging
+ Smss.exe                                                                          Manager        Pagefile.sys <---data---> Pagefile.sys
+    |                                                                                 |
+    |                                                                            System Idle
+    V                           __________________                                 Process 
+Csrss.exe                      / Userinit  calls  \
+    |---------------\         |Explorer then dies |
+    |               |         |Leaving explorer   |
+    V               V         |To winlogon.       |
+Wininit.exe    Winlogon.exe ----> Userinit.exe ----> Explorer.exe
+    |--------------\
+    |              |
+    V              V
+Services.exe   Lsass.exe
+    |--------------\--------------\---Svchost.exe - - - > > > (Svchost.exe runs multiple copies for what is needed to run the system at that point :3)
+    |              |              |
+    V              V              V
+Svchost.exe    Svchost.exe    Svchost.exe
+    
+    
+POST --> does the hardware exist?
+BIOS --> uses MBR, starts the Bootmgr. BIOS is the older version of UEFI.
+UEFI --> uses GPT (global partition table), starts the Bootmgrfw.efi, loaded into flash memory and is much faster. you can update firmware without loading the OS and there is the secure boot. verifys Drivers and ensures if the system has been changed while it is off\not powered on. when Secure boot is enabled, it is protected in almost every way. this is preferd over BIOS.
+MBR --> the master boot record, the first 512 bytes on the driver. points to the Bootmgr.
+bootmgr.exe --> manages what is loaded at startup. 
+  -whinresume.exe --> is for hibernation, takes everything in ram, EVERYTHING. and writes it to a disk. it then powers off the machine very slowly. when the system is powered on again. it calls Hiberfil.sys to load the system.
+Winload.exe -->
+
+Ntoskrnl.exe --> this is the windows Kernal, Winload calls the kernal and from there it takes control.
+
+Smss.exe
+Csrss.exe --> starts Wininit.exe and the Winlogon.exe
+
+--- wininit.exe ---
+Wininit.exe -->
+Lsass.exe -->
+Services.exe --> loads Svchost.exe, there are many launched
+
+
+
+
+
+--- winlogon.exe ---
+Winlogon.exe -->
+Userinit.exe -->
+Explorer.exe -->
+
+coldboot --> (system restarts shut off the entire os)
+hotboot --> (the os stays active as the rest of the machine restarts)
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
