@@ -134,42 +134,123 @@ ls -lisa /var/tmp/.
  
  
  
+ ==================================================== U N I X   B O O T   P R O C E S S ===============================================================
  
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
+ POST (power on self test)
+  |-------------------------------------------\
+  |                                            \
+  V                                             \
+(BIG MIKE GOT KIILED IN RUSSIA (Bmgkir))         |
+ BIOS                                           UEFI
+  |                                              |
+  V                                              V
+ MBR                                            GPT
+  |                                              |
+  V                                              V
+ GRUB                                          grub.efi
+  \-----------------\      /-------------------/
+                     V    V
+                     Kernel
+   /-----------------/    \--------------------\
+  V                                             V
+ Init                                          Init
+  |                                             |
+  V                                             V
+SysV (sys 5)                               systemd Init
+  \-----------------\      /-------------------/
+                     V    V
+        System executes at wanted run level
+
+UEFI
+Boots faster
+supports 9 zettabytes of space.
+supports GPT and increased number of partitions.
+'sudo dmidecode -t bios' shows what you have loaded for UEFI vs. BIOS
+'lsblk' shows what disks are mounted and where.
+'df -h' is another that shows nore thann the last one
+'sudo parted -l' shows info on partitions.
+
+====== HEX dump ========
+'sudo xxd -l <length in bytes(512)> -g 1 <use lsblk to figure out where it is>/dev/vda>' shows a hex dump of things.
+eb --> a hex of 'eb' means JUMP the following two bytes tell it where to jump
+90 --> this is the NO-OP sleed
+the last 66 bytes make up the magic number and the 4 partitions
+2 bytes of magic number
+64 bytes for partition
+446 bytes for the the rest of the mbr
+
+======= Copy the boot record ========
+'sudo dd if=/dev/sda of=MBRcopy bs=1 count= 512'
+
+======= GRUB =========
+the config file is - /boot/grub/menu.lst
+altering boot entries, election different kernels, and modifying th initial RAM dis (initrd)
+after doing such, the 'e' key can be used to edit the commands before booting, 'a' to modify the kernel arguments before
+
+cat /boot/grub/grub.cfg
+allows one to read the menu entries, it is all bash. all of it... all.
+
+====== Kernel (pid 0) =========== 
+kernel is process id 0 [kthreadd]
+while the system is running after boot, the kernal runs the interaction between the os and the hardware.
+Linux is a monolithic code that is 26 million lines of code in C.
+'sudo lsmod' shows the modules that the kernel uses to interact with hardware.
+kernels are hard codded to execute sbin/init (backwards compatability)
+
+========== INIT and Runlevel =========
+--- SysV ---
+the only way to shut off a computer
+'ls -l /sbin/init' if there is a link to systemd, you're on a SysD 2010 system, if not you're on SysV 1983 system
+'ps -p 1' shows the pid 1 systemd cmd, if its not there you are on a SysV 1983 system
+'pstree'
+INIT is the Service/ and process manager
+on a SysD system it shows SystemD as the parent process. not init.
+'ls /etc/rc3.d' this shows everything that runs at init runlevel 3 the 's' at the beguining of them tells them to start, to kill them (ls /etc/rc1.d <runlevel 0 is halt>) you put a 'k' at the beguining 
+
+cat /etc/inittab if you need to see the settings for init/runlevel
+runlevel 0 --> is halt. DO NOT SET AS DEFAULT.
+runlevel 1 --> Root singleuser.
+runlevel 2 --> full multiuser, without networking.
+runlevel 3 --> full multiuser, with networking.
+runlevel 4 --> unused multiuser.
+runlevel 5 --> X11 multiuser network GUI.
+runlevel 6 --> is reboot.  DO NOT SET AS DEFAULT.
+if there is a service running other than an init.d service, then its probs malicious
+
+--- SysD ---
+runlevel
+   0  =  poweroff.target --> shuts down and powers down the system
+   1  =  rescue.target --> Configres a rescue shell session
+   2  =  Multi-user.target --> Not with Network sercives
+   3  =  Multi-user.target --> with Network sercives
+   4  =  Multi-user.target --> with Network sercives
+   5  =  Graphical.target --> Graphical, with Network sercives
+   6  =  reboot.target --> shuts down and reboots
+
+sysd also has 'systemctl list-dependencies graphical.target' to show dependancies that runlevel 5 needs, its color coded too. green = active, white = inactive, red cross= bad 
+'systemctl show -p wants raphical.target' shows the wants of the targeted runlevel.
+'systemctl list-unit-files' this is color codded too. shows the ini-like files
+'systemctl cat graphical.target' tells you the location of the runlevel and gives a brief description of the unit requirements and want.
+
+--- used for interactive login shells---
+cat /etc/environment --> global/system wide
+cat /etc/profile -->  global/system wide > used for persistence, .profile stores the user spisific persistances 
+cat /etc/bash.bashrc --> this is the system-wide bash.rc file.
+
+ctl+alt+t gives you a non-login shell
+
+========== QUESTIONS ============
+minimum size of kernal modules
+
+
+whats the difference of static and transient(means something along the lines of tmp, it has to do with scope.) in 'systemctl list-unit-files'
+:: enabled = means it starts with the comp start. static = means if the instal section is not there that unit cannot be enabled or disabled. disabled = means it is not setup to run when system starts. transient = created to be run like a service while the system is running
+
+
+
+
+
+
+
+
+
