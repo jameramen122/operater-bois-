@@ -165,20 +165,39 @@ coldboot --> (system restarts shut off the entire os)
 hotboot --> (the os stays active as the rest of the machine restarts)
 
 
+=============== Processes and services ================= (Day 6 Operating Systems)
+
+A process requires interaction, a service starts and stops on its own.
+
+a dll is a resorce that contains info that other services and processes call upon.
+dll's help the most with backwards compatability.
+
+taskmgr shows system resorces being used.
+
+get-ciminstance win32_pocess 
+or 
+get-wmiobject
+this shows hidden proceses.  
+
+get-CimClass -Classname *
+shows every cim class. there is a few of them on the system    
+
+get-ciminstance win32_process | select * shows a Handlecount "a number that counts how many times a process requested info from a dll."
+get-ciminstance win32_process | where -property Name -like *LSASS* | select * --> shows everything for anything pertaining to lsass.
+
+one way to manipulate an exe is to do DLL injection to change what the exe handles too. >:3
 
 
+get-process -name lsass | select -expandproperty Modules | out-file $HOME\desktop\handles.txt -width 4096 --> -width writes output past what the screen can read.
+get-process -name lsass | select -expandproperty Modules | format-table -wrap --> word wrap on the teminal... or just like, lessen the font size.
+tasklist /m /fi "IMAGENAME eq lsass.exe"
 
+sc.exe --> this is the service control manager. I recomend showsid as an option
+    sc is an alias for set-content
     
-    
-    
-    
-    
-    
-    
-    
-
-
-
+schtasks.exe --> displays all schedualed tasks.
+schtasks.exe /query /tn "\Microsoft\XbGamesSave\Xb1GameSaveTask" --> displays the xbox live save service for the xbox 1
+the Gui for the scheduler is called "Task Scheduler"
 
 
 
