@@ -197,23 +197,53 @@ sc.exe --> this is the service control manager. I recomend showsid as an option
     
 schtasks.exe --> displays all schedualed tasks.
 schtasks.exe /query /tn "\Microsoft\XbGamesSave\Xb1GameSaveTask" --> displays the xbox live save service for the xbox 1
+
 the Gui for the scheduler is called "Task Scheduler"
+the most default task directory is either root "\" or "\Microsoft\", for custom ones
+
+schtasks.exe /query /tn "\Microsoft\XbGamesSave\Xb1GameSaveTask" /v /fo list --> displays a formated list of verbose output.
 
 
+netstat -anob --> shows a nornam netstat
+
+=== sysinternals===
+procesxp.exe --> give a higharchial veiw of running thigs\
+                  > used one to analize the, so they are thereeeee,,,
+procmon64.exe -->
+autoruns64.exe --> scans the regestry for you to have a better view. (pink means that the thingy is not verifierd. Yello means that an entry was made with nothing aassigned to it)
+tcpview --> shows a refreshing display of colors and lightshows doing the job of everything listed prior
 
 
+=========================== U A C ============================
+this is a Gui only tool, "Are You Sure You Want To Do This?"
 
+User Account Control
+it limits the privileges of user ran applications 
+The Registry key is located at "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System"
+EnableLUA                     : 1 
 
+---is color coded consent prompts---
+Red - Application or publisher blocked by group policy
+Blue & gold - Administrative application
+Blue - Trusted and Authenticode signed application
+Yellow - Unsigned or signed but not trusted application
 
+---WILL THE UAC PROMPT SHOW?---
+Does the file/binary/executable meet these conditions?
+Auto Elvate is True
+./strings C:\Windows\System32\*.exe -accepteula | select-string -SimpleMatch "autoelevate"
+Digitally Signed
+./sigcheck -m C:\Windows\System32\slui.exe -accepteula | Select-String -SimpleMatch "level"
+Trusted Directory
+i.e C:\Windows\System32
 
-
-
-
-
-
-
-
-
+---USER INTERFACE PRIVILEGE ISOLATION---
+UIPI was implemented, starting with Windows Vista:
+UIPI is part of UAC, and is designed to protect against shatter attacks.
+In UIPI, each process is given a privilege level.
+Higher integrity level processes can send messages to lower integrity level processes.
+Lower can only receive messages from higher.
+UIPI can be bypassed by signed and trusted applications with the UIaccess manifest setting.
 
 
 
