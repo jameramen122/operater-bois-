@@ -248,6 +248,120 @@ whats the difference of static and transient(means something along the lines of 
 
 
 
+===================================== P r o c e s s   V a l i d i t y =========================================
+
+ps --> process snapshot
+top --> a live updating process listing
+ps -elf --> 'e' is for everything, 'l' long listing, 'f' formating.
+ps -Nlf --ppid 2 --> Not anything that has a parrent process of 2 [kthreadd] (the kernel)
+ps -Nlf --ppid 2 --forest --> has a 'tree-like' format for the processes 
+ps -Nlf --ppid 2 --forest | grep ps
+ps -elf --ppid 2 --forest | grep -B 8 ps --> this greps for the item ps and its process tree
+
+grep -B <number> --> shows lines before the grep'd item
+grep -A <number> --> shows lines after the grep'd item
+grep --context=<#> <item> --> above and below
+
+this is the top command, its the dynamicly changing process manager.
+
+top - 12:49:29 up 11 days, 16:35,  2 users,  load average: 0.00, 0.00, 0.00
+Tasks:  91 total,   1 running,  54 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.3 us,  0.3 sy,  0.0 ni, 99.3 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem :  4039252 total,  3112396 free,   109528 used,   817328 buff/cache
+KiB Swap:        0 total,        0 free,        0 used.  3639904 avail Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND  
+
+
+load average: 0.00, 0.00, 0.00 --> load average max's out at x.00 where x is the amount of processer cores you have.
+f --> press f while in top to add options with spacebar. exit with escape.
+Shift + V --> makes the listing like --forest. but funnier.
+
+htop --> way nicer looking but has a lot of things going on.
+
+
+system calls
+shell --> fork() --> shell
+                       |
+                  cp of shell --> exec(ls) --> ls
+                  
+
+if the process is in all caps it is a childprocess. and that there is a rocess.
+so if there is a /usr/sbin/cron
+                      \_ /usr/sbin/CRON --> this means there is a cronjob running.
+
+====================== o r p h a n   a n d   z o m b i e   p r o c e s s e s ================================
+orphans have lost there parent process.
+orphan processes are taken in by systemd or init.
+Daemons are orphans but not all orphans are daemon
+disown -a && exit --> close a shell/terminal and force all children to be adopted
+
+Zombie (Defunct) --> a process that has compleated but the parent process hasn't picked it back up leaving it in the process table taking up an entry. under the 'S' (state) catagory of a ps -elf command these show up as 'Z' or 'D'
+
+fork bomb --> a DOS attackwherein a process continually replicates itself to deplete available system resources,
+              Remedy - ‘ulimit -u 30’ sets the max processes a user can run at 30
+
+Daemons run in the background. 
+Persistence - Daemons are service that should run for duration of system operation, since init is parent, would require shutdown for parent to die.
+Malicious processes are sometimes orphaned and named to make it look like a daemon process ‘ps --ppid 1 -lf’
+
+=============================== j o b   c o n t r o l ====================================
+
+the default signal for a 'kill' command is 15. to shutdown gracefully
+the 'kill -9' sends the signal 9 tears it down without care to the state of the program.
+kill -l --> shows a listing of every signal that can be sent... all 64 of them >_<
+                - 38-64 are SIGRTMIN and SIGRTMAX. they are set aside for what you need for customization. 
+
+============================== C R O N  J O B S ===========================================
+
+scheduled tasks!!!
+
+- cron daemon checks the directories /var/spool/cron, /etc/cron.d and the file /etc/crontab.
+    - the daemon does this once a minute and executes any commands specified that match the time.
+
+- Two types of cron jobs
+  -System cron jobs
+    -run as root and rigidly scheduled
+    -perform system-wide maintenance tasks (Cleaning out /tmp or rotating logs)
+    -controlled by /etc/crontab
+  -User cron jobs
+    -Use 'crontab’ command to create user cron jobs
+    -stored in /var/spool/cron/crontabs/<username>
+
+the system uses cron.d, /etc/crontab could be very empty. var/spool/cron is a directory for users.
+
+‘crontab -u [user] file’ - sets users crontab file to the contents of listed file
+‘crontab -l -u [user]’ - Displays user’s crontab contents
+‘crontab -r -u [user]’ - Removes user’s crontab contents
+‘crontab -e -u [user]’ - edits user’s crontab contents
+
+crontab jobs run with the permissions of the owner of the crontab file
+
+CRON SYNTAX
+* * * * * /directory/and/command
+| | | | |
+| | | | +---- Day of the Week   (range: 0-7, 1 = Monday, 2 = Teusday, 3 = Wensday, 4 = Thursday, 5 = Friday, 6 = Saturday, 7 = Sunday, 0 = Sunday)
+| | | +------ Month of the Year (range: 1-12)
+| | +-------- Day of the Month  (range: 1-31)
+| +---------- Hour              (range: 0-23)
++------------ Minute            (range: 0-59)
+
+==================================== l s o f ==============================================
+
+this is a silly command... :3
+
+sudo lsof -c sshd --> gets the running 'processes' for the process sshd.
+
+
+=================================== r a n d o m b u l l s h i t a a a a a ==============================================
+sudo systemctl list-units --all --> displays all units
+
+
+
+
+
+
+
 
 
 
