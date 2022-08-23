@@ -352,6 +352,12 @@ this is a silly command... :3
 
 sudo lsof -c sshd --> gets the running 'processes' for the process sshd.
 
+#    :  The number in front of flag(s) is the file descriptor number used by the process to associate with the file
+u    :  File open with Read and Write permission
+r    :  File open with Read permission
+w    :  File open with Write permission
+W    :  File open with Write permission and with Write Lock on entire file
+mem  :   Memory mapped file, usually for shared library
 
 =================================== r a n d o m b u l l s h i t a a a a a ==============================================
 sudo systemctl list-units --all --> displays all units
