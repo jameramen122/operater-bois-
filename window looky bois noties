@@ -1,3 +1,7 @@
+
+xfreerdp /u:student /v:10.50.39.142 /dynamic-resolution +glyph-cache +clipboard
+
+
 ---WSMAN---
 <oh really? O.o *sweats*>
 get-item WSMAN:\localhost\client\trustedhost
