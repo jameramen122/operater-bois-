@@ -251,3 +251,62 @@ UIPI can be bypassed by signed and trusted applications with the UIaccess manife
 
 
 
+============================= W I N D O W S   A R T I F A C T S ,   A U D I T I N G ,   A N D   L O G G I N G  ===========================================
+
+WINDOWS ARTIFACTS --> something left behind, left over files and something that was not covered up on the operating system from code execution.
+)+(Enumeration and info from a code exe. a historical analysis of the machine! :3)+(Every form of persistance is an artifact.)+(
+
+Many artifacts will require the operator use a Security Identifer (SID) to dig in user specific registry locations to enumerate the artifact information. 
+A few ways to achieve this are provided below:
+
+get-wmiobject win32_useraccount | select name,sid (PowerShell)
+Get-LocalUser | select Name,SID (PowerShell)
+wmic useraccount get name,sid (CMD.EXE ONLY)
+
+-UserAssist --> The UserAssist registry key tracks the GUI-based programs that were ran by a particular user.
+    - View executable Files run:
+    - Get-ItemProperty 'REGISTRY::HKEY_USERS\*\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count'
+    - View Shortcut files executed:
+    - Get-ItemProperty 'REGISTRY::HKEY_USERS\*\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\UserAssist\{F4E57C4B-2036-45F0-A9AB-443BCFE33D9F}\Count'
+
+-Windows Background Activity Moderator (BAM) --> BAM is a Windows service that Controls activity of background applications. (Win10 build 1709 (2017) and newer)
+    - Get-Itemproperty 'HKLM:\SYSTEM\CurrentControlSet\Services\bam\UserSettings\*' (Windows 1709 & 1803)
+    - Get-Itemproperty 'HKLM:\SYSTEM\CurrentControlSet\Services\bam\state\UserSettings\*' (Windows 1809 and newer)
+
+-Recycle Bin --> The recycle bin is a very important location on a Windows file system to understand. It can help you accomplish a forensic investigation.
+    - gci 'C:\$RECYCLE.BIN' -Recurse -Verbose -Force | select *
+    - gci 'C:\$RECYCLE.BIN' -Recurse -Force
+
+-Prefetch --> Prefetch files are created by the windows operating system when an application is run from a specific location for the first time.
+    - gci -Path 'C:\Windows\Prefetch' -ErrorAction Continue | select * | select -first 5
+
+-Jump Lists -->
+    - The Windows 7-10 taskbar (Jump List) is engineered to allow users to “jump” or access items they have frequently or recently used quickly and easily.
+    - gci -Recurse C:\Users\*\AppData\Roaming\Microsoft\Windows\Recent -ErrorAction Continue | select FullName, LastAccessTime
+
+-Recent Files -->
+
+
+-Browser Artifacts -->
+
++=+=+=+=+=+=+=+=+=+=+=+=+ V E R  I M P O R T A N T +=+=+=+=+=+=+=+=+=+=+=+=+
+gci 'C:\$Recycle.bin' -Force -Recurse | ForEach-Object { if ( ($_.extension) -like ".exe") { if ($_.name -like "`$R*") {Write-Host $_.name -NoNewline ; Write-Host " --> " -ForeGroundColor green -NoNewline ; Get-content $fullname } } }
++=+=+=+=+=+=+=+=+=+=+=+=+ V E R  I M P O R T A N T +=+=+=+=+=+=+=+=+=+=+=+=+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
