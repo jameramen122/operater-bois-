@@ -310,6 +310,18 @@ gci 'C:\$Recycle.bin' -Force -Recurse | ForEach-Object { if ( ($_.extension) -li
 ======================================================== W I N D O W S   A U D I T I N G =================================================================
 
 
+auditpol /get /category:* --> this is used to audit everything/    E V E R Y T H I N G . . .
+
+
+
+
+
+
+
+
+
+
+
 
 
 
