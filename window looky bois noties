@@ -310,27 +310,39 @@ gci 'C:\$Recycle.bin' -Force -Recurse | ForEach-Object { if ( ($_.extension) -li
 ======================================================== W I N D O W S   A U D I T I N G =================================================================
 
 
-auditpol /get /category:* --> this is used to audit everything/    E V E R Y T H I N G . . .
+auditpol /get /category:* --> this is used to audit everything/    
 
+--- WINDOWS EVENT LOG ---
+Application - Contains events logged by applications.
+Security - Contains events such as valid/ invalid logon attempts and other events related to resource use like creating, opening, or deleting files.
+System - Contains events logged by system components, such as driver failures other system component to load during startup.
+CustomLog - Contains events logged by applications that create a custom log.
+          - Using a custom log enables an application to control the size of the log or attach ACLs for security purposes without affecting other applications.
 
+Get-EventLog -Logname Security -Message "*remote*" | ft -wrap --> does a thing
+get-winevent --> "said to be depricated... but it hasen't yet so use it... b..baka..!" >:3
 
+--- CONFIGURE AUDIT POLICY ---
 
+View entire auditpol list . . . E V E R Y T H I N G . . . 
+auditpol /get /category:*
 
+Set File SYstem subcategory to audit
+auditpol /set /subcategory:"File System"
 
+Remove File System subcategory auditing
+auditpol /set /subcategory:"File System" /success:disable
 
+To list the global object access auditing entries set on files or folders:
+auditpol /resourceSACL /type:File /view
 
+To list the global object access auditing entries set on Registry Keys
+auditpol /resourceSACL /type:Key /view
 
-
-
-
-
-
-
-
-
-
-
-
+--- VIEW/ ANALYZE EVENT LOGS - GUI ---
+eventvwr
+Located in C:\Windows\System32\Winevt folder.
+Locations are configurable.
 
 
 
