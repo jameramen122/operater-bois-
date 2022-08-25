@@ -455,8 +455,30 @@ mail.*                               -/var/log/mail.log
 (*.!<whatever> grabs the opposet of the prior)
 
 
+--- LOG ENUMERATION / MANAGEMENT ---
+ -Best Practices
+   -Meaningful Naming Schema
+   -Separate logs logically and by precedence
+   -Sync time across network
+   -Control log access
+ -Utilize cron jobs / scripts
+   -logrotate
+     /etc/logrotate.conf
+     How large to let files get. How long to keep them. --> a day should really be the longest you keep a log except for maybe a really crazy one.
 
+--- USEFUL LOGGING COMMANDS ---
+  tail -f - Continuously show end of file
+  less /var/log/syslog - View Log in page viewer
+  logger - Send a user generated message to system Log i.e. Starting Update
+  > /var/log/messages - Wipes Logs
+    Why do this as opposed to deleting/recreating files?
+  last -f /var/log{wtmp,btmp} - Needed to view data files
 
-
-
+  --- SYSTEM D STIFFS ---
+  read logs w/ journalctl
+  
+  journalctl -b <id?> -->
+  journalctl -u <log name> --> looks at entries in a log
+  
+  
 
