@@ -1,3 +1,4 @@
+https://os.cybbh.io/public/os/latest/index.html
 
 xfreerdp /u:student /v:10.50.39.142 /dynamic-resolution +glyph-cache +clipboard
 
@@ -418,6 +419,98 @@ net use * \\live.sysinternals.com\tools --> to mount the sysinternals to a file/
 
 .\volatility_2.6_win64_standalone.exe -f ".\cridex.vmem" --profile=WinXPXS2x86 connections --> shows open connections. only active connections however.
 .\volatility_2.6_win64_standalone.exe -f ".\cridex.vmem" --profile=WinXPXS2x86 connscan --> active and recently closed ip connections
+
+=============================== A C T I V E  D I R E C T O R Y ,  B L O O D H O U N D ,  A N D  P O W E R V I E W ======================================
+
+Group nesting  
+ - What security flaws does group nesting create?
+  -AD Nested group enumeration.
+  -giving people too many permisions!
+
+gwmi win32_service | where { $_.name -like "adws" -or $_.name -like "kdc" -or $_.name -like "netlogon" -or $_.name -like "dns" } | select name, state, status
+
+name     state   status
+----     -----   ------
+ADWS     Running OK
+DNS      Running OK
+Kdc      Running OK
+Netlogon Running OK
+
+
+Get-ADDomainController
+  -gets domain controller info
+
+Get-ADforrest army.warriors --> gets specific info on the domain! :3
+Get-ADforest army.warriors --> gets info on the fore  t
+get-smbshare --> shows important shares in the tree/  domain controller. requires the C:\ to share, its a good way to shut down a domain controller.   
+
+
+get-module ActiveDirect-ory--
+
+get-command -Module ActiveDirectory --> finds commands that are used only for the ACTIVE DIRECTORY.
+get-adgroupmember -identity "Domain Admins" --> gathers info 
+
+Sus amougus activity \
+                      V
+ -Unknown admin accounts
+ -Active outside normal work hours
+ -Nested groups
+ -Service accounts logging into hosts
+ -User accounts logging into critical infrastructure (i.e. Domain Controller)
+
+
+DSTOOLS : this is older than me, so i wont talk about at once
+DSADD
+DSGET
+DSMOD
+DSMOVE
+DSQUERY
+
+POWERSHELL AD COMMANDS
+(VERB)-AD(NOUN)
+Examples
+Get-ADUser
+New-ADUser -Name "Bad Guy" -PasswordNotRequired 1 -Path "OU=3RD LPT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=ARMY,DC=WARRIORS"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
