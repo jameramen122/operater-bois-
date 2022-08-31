@@ -1,0 +1,14 @@
+gci 'C:$Recycle.Bin' -Force -Recurse | ForEach-Object { if (($.extension) -like ".txt") { if ($.Name -like "`$R*") { Write-Host $.Name -NoNewline ; Write-host " --> " -ForegroundColor Green -NoNewline ; get-content $.fullname }}}
+
+gwmi win32_service | where { $_.name -like "adws" -or $_.name -like "kdc" -or $_.name -like "netlogon" -or $_.name -like "dns" } | select name,state,status
+
+
+
+
+
+
+
+
+
+
+
