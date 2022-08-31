@@ -473,6 +473,17 @@ Get-ADUser
 New-ADUser -Name "Bad Guy" -PasswordNotRequired 1 -Path "OU=3RD LPT,OU=CCO,OU=3RDBN,OU=WARRIORS,DC=ARMY,DC=WARRIORS"
 
 
+=========================================================================================================================================================
+
+Where am I?
+Who am I?
+what am I allowed to do?
+Wgats going on?
+wats that?
+whys that?
+why is it happen?
+how happen?
+what in der?
 
 
 
