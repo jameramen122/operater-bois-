@@ -1,0 +1,113 @@
+Clear-Host
+Write-Host -NoNewline "Checking PowerShell Session Privileges"
+sleep 1
+Write-Host -NoNewline " ."
+sleep 1
+Write-Host -NoNewline " ."
+sleep 1
+Write-Host -NoNewline " ."
+Sleep 1
+
+
+function Priv-Check {
+
+    $sid = [security.principal.windowsidentity]::GetCurrent()
+    $privs = new-object System.Security.Principal.WindowsPrincipal($sid)
+    clear-host
+    if ($privs.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        Write-Output $true 
+        }
+    else {
+        Write-Output $false
+        }
+    }
+
+if (-not(Priv-Check)) {
+        Write-Host -BackgroundColor Black -ForegroundColor Red "CHECK YOUR PRIVILEGE!!!"
+        sleep 2
+        throw "Run this script with Elevated/Administrative Rights"
+        }
+
+Function SysInternals-Download {
+
+    $menu = New-Object -TypeName psobject
+    $menu | Add-Member -MemberType NoteProperty -Name 1 -Value "Net Use"
+    $menu | Add-Member -MemberType NoteProperty -Name 2 -Value "Add a New PSDrive"
+    $menu | Add-Member -MemberType NoteProperty -Name 3 -Value "Invoke WebRequest Download"
+    $menu | Add-Member -MemberType NoteProperty -Name 4 -Value "Invoke Webrequest Download and add to System Env Path"
+    $menu | Add-Member -MemberType NoteProperty -Name 5 -Value "Exit"
+
+    Clear-Host
+    Write-Host "Menu"
+    Write-Host "----------------------" -NoNewline
+    $menu
+
+    DO {
+                
+        [int]$Number = Read-Host -Prompt "Please Select how you want to get SysInternals"
+
+        if ( $Number -notmatch '^[1-5]$' ) {
+            
+            Clear-Host
+
+            Write-Host "Menu"
+            Write-Host "--------"
+            $menu
+           
+            Write-Host " Invalid Menu Option " -ForegroundColor Black -BackgroundColor Red -NoNewline
+            Write-Host " " -NoNewLine
+            }
+        } Until ($Number -match '^[1-5]$')
+
+    switch ($Number) {
+
+        1 {
+            Write-Host "Mapping SysInternals to a Temp Drive"
+            Write-Host -NoNewline "Utilized the command `"" ; Write-Host -NoNewline -ForegroundColor Green "net use * http://live.sysinternals.com" ; Write-Host -NoNewline "`""
+            Write-Host ""
+            net use * http://live.sysinternals.com
+        }
+        2 {
+            Write-Host "Creating a new PS Drive to live.sysinternals.com/tools"
+            Write-Host -NoNewline "Utilized the command `"" ; Write-Host -NoNewline -ForegroundColor Green 'New-PSDrive -Name "SysInt" -PSProvider FileSystem -Root "\\live.sysinternals.com\Tools' ; Write-Host -NoNewline "`""
+            Write-Host ""
+            New-PSDrive -Name "SysInt" -PSProvider FileSystem -Root "\\live.sysinternals.com\Tools"
+            Write-Host -NoNewline "Sysinternals is mapped to the drive" ; Write-Host -NoNewline -ForegroundColor Green " SysInt:\"
+            Write-Host $null    
+        }
+        3 {
+            Write-Host "Downloading SysInternals"
+            Invoke-WebRequest -Uri "https://download.sysinternals.com/files/SysinternalsSuite.zip" -OutFile $env:HOMEDRIVE\SysInternalsSuite.zip  
+            Expand-Archive $env:HOMEDRIVE\SysInternalsSuite.zip -DestinationPath $env:HOMEDRIVE\SysInternals -Force
+            Write-Host "Removing Temp Files"
+            Remove-item $env:HOMEDRIVE\SysInternalsSuite.zip 
+            Unblock-File $env:HOMEDRIVE\SysInternals\*
+            Write-Host -NoNewline "Sysinternals has been downloaded to directory " ; Write-Host -NoNewline -ForegroundColor Green "C:\SysInternals"
+            Write-Host $null
+        }        
+        4 {
+            Write-Host "Downloading SysInternals"
+            Invoke-WebRequest -Uri "https://download.sysinternals.com/files/SysinternalsSuite.zip" -OutFile $env:HOMEDRIVE\SysInternalsSuite.zip  
+            Expand-Archive $env:HOMEDRIVE\SysInternalsSuite.zip -DestinationPath $env:HOMEDRIVE\SysInternals -Force
+            Write-Host "Removing Temp Files"
+            Remove-item $env:HOMEDRIVE\SysInternalsSuite.zip 
+            Unblock-File $env:HOMEDRIVE\SysInternals\* 
+            Write-Host "Adding C:\SysInternals Directory to the Machine Environmental Path"
+            [Environment]::SetEnvironmentVariable("PATH", $env:Path + ";C:\SysInternals", 'Machine')
+            Write-Host "Reloading PowerShell's Environmental Variables"
+            $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User") 
+            Write-Host -NoNewline "SysInternals has been Downloaded to "; Write-Host -NoNewline -ForegroundColor Green "C:\SysInternals" ; Write-Host -NoNewline " and has been added to the Machine's Environmental Path"
+            Write-Host $null
+        }
+        5 {
+            Write-Host "Good Bye"
+            break
+        }
+
+    }
+}
+
+SysInternals-Download
+
+Remove-Item function:Priv-Check
+Remove-Item function:SysInternals-Download

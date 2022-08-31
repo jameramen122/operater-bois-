@@ -1,0 +1,136 @@
+Function pause ($message)
+{
+    # Check if running Powershell ISE
+    if ($psISE)
+    {
+        Add-Type -AssemblyName System.Windows.Forms
+        [System.Windows.Forms.MessageBox]::Show("$message")
+    }
+    else
+    {
+        Write-Host "$message" -ForegroundColor Gray -BackgroundColor Red
+        $x = $host.ui.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    }
+}
+
+Function cmd_pause ($message)
+{
+    # Check if running Powershell ISE
+    if ($psISE)
+    {
+        Add-Type -AssemblyName System.Windows.Forms
+        [System.Windows.Forms.MessageBox]::Show("$message")
+    }
+    else
+    {
+        Write-Host "$message" -ForegroundColor Black -BackgroundColor Gray
+        $x = $host.ui.RawUI.ReadKey("NoEcho,IncludeKeyDown")
+    }
+}
+
+Clear-Host
+echo ""
+
+Write-Host "Pulling all Services" -BackgroundColor Black -ForegroundColor Green
+Write-Host "Get-Service" -ForegroundColor Yellow
+cmd_pause "Press any key to execute the command above"
+Get-Service
+
+
+echo ""
+pause "Press Any Key to Continue"
+Clear-Host
+echo ""
+echo ""
+
+Write-Host "Pulling all Services and all thier properties" -BackgroundColor Black -ForegroundColor Green
+Write-Host "Get-Service | Select-Object -Property *" -ForegroundColor Yellow
+cmd_pause "Press any key to execute the command above"
+Get-Service | Select-Object -Property * 
+
+
+echo ""
+pause "Press Any Key to Continue"
+Clear-Host
+echo ""
+echo ""
+
+Write-Host "Pulling only the DHCP Service and its properties" -BackgroundColor Black -ForegroundColor Green
+Write-Host "Get-Service | Select-Object -Property * | Where-Object { `$_.Name -Like '*DHCP*' }" -ForegroundColor Yellow
+cmd_pause "Press any key to execute the command above"
+Get-Service | Select-Object -Property * | Where-Object { $_.Name -Like '*DHCP*' } 
+
+
+echo ""
+pause "Press Any Key to Continue"
+Clear-Host
+echo ""
+echo ""
+
+Write-Host "Pulling all Services with WMI" -BackgroundColor Black -ForegroundColor Green
+Write-Host "Get-WmiObject win32_service" -ForegroundColor Yellow
+cmd_pause "Press any key to execute the command above"
+Get-WmiObject win32_service 
+
+
+echo ""
+pause "Press Any Key to Continue"
+Clear-Host
+echo ""
+echo ""
+
+Write-Host "Pulling all Services and all thier properties" -BackgroundColor Black -ForegroundColor Green
+Write-Host "Get-WmiObject win32_service | Select-Object -Property *" -ForegroundColor Yellow
+cmd_pause "Press any key to execute the command above"
+Get-WmiObject win32_service | Select-Object -Property *
+
+
+echo ""
+pause "Press Any Key to Continue"
+Clear-Host
+echo ""
+echo ""
+
+Write-Host "Pulling only the DHCP Service and its properties" -BackgroundColor Black -ForegroundColor Green
+Write-Host "Get-WmiObject win32_service | Select-Object -Property * | Where-Object { `$_.Name -Like '*DHCP*' }" -ForegroundColor Yellow
+cmd_pause "Press any key to execute the command above"
+Get-WmiObject win32_service | Select-Object -Property * | Where-Object { $_.Name -Like '*DHCP*' } 
+
+
+echo ""
+pause "Press Any Key to Continue"
+Clear-Host
+echo ""
+echo ""
+
+Write-Host "Pulling only the DHCP Service and selecting only the Name and Description properties" -BackgroundColor Black -ForegroundColor Green
+Write-Host "Get-WmiObject win32_service | Select-Object -Property Name, Description | Where-Object { `$_.Name -Like '*DHCP*' } " -ForegroundColor Yellow
+cmd_pause "Press any key to execute the command above"
+Get-WmiObject win32_service | Select-Object -Property Name, Description | Where-Object { $_.Name -Like '*DHCP*' } 
+
+
+echo ""
+pause "Press Any Key to Continue"
+Clear-Host
+echo ""
+echo ""
+
+Write-Host "Pulling only the DHCP Service formatting a table with the Name/Description" -BackgroundColor Black -ForegroundColor Green
+Write-Host "Get-WmiObject win32_service | Select-Object -Property Name, Description | Where-Object { `$_.Name -Like '*DHCP*' } | Format-Table " -ForegroundColor Yellow
+cmd_pause "Press any key to execute the command above"
+Get-WmiObject win32_service | Select-Object -Property Name, Description | Where-Object { $_.Name -Like '*DHCP*' } | Format-Table
+
+
+echo ""
+pause "Press Any Key to Continue"
+Clear-Host
+echo ""
+echo ""
+
+Write-Host "Pulling only the DHCP Service formatting a table with the Name/Description being wrapped" -BackgroundColor Black -ForegroundColor Green
+Write-Host "Get-WmiObject win32_service | Select-Object -Property Name, Description | Where-Object { `$_.Name -Like '*DHCP*' } | Format-Table -Wrap " -ForegroundColor Yellow
+cmd_pause "Press any key to execute the command above"
+Get-WmiObject win32_service | Select-Object -Property Name, Description | Where-Object { $_.Name -Like '*DHCP*' } | Format-Table -Wrap
+
+pause "Press Any Key to Continue"
+Clear-Host

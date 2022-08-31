@@ -1,0 +1,36 @@
+function Find-ServiceLoadOrderGroup {
+[CmdLetBinding()]
+param (
+    [Parameter(Mandatory=$True)]
+    [string]$ServiceName
+    )
+
+    do { 
+        if ([string]::IsNullOrWhiteSpace($ServiceName)) {
+            $ServiceName=read-host -prompt "Enter the Service Name"
+            }
+        }Until (! [string]::IsNullOrWhiteSpace($ServiceName))
+
+    $Name = Get-WmiObject Win32_Service | Select * | Where { $_.name -like "*$ServiceName*" } | Select -ExpandProperty Name
+    
+    if ([string]::IsNullOrWhiteSpace($Name)) {
+        $NewName = Get-WmiObject Win32_Service | Select * | Where { $_.Displayname -like "*$ServiceName*" } | Select -ExpandProperty Name
+        if ([string]::IsNullOrWhiteSpace($NewName)) {
+            throw "Service with a name/displayname of $ServiceName was not found"
+            }
+        else {
+        $name = $NewName
+            }
+    }
+
+    $GroupName = Get-WmiObject win32_loadordergroupservicemembers | where {$_.PartComponent -like "*$name*"} | select -ExpandProperty GroupComponent
+    
+    if ([string]::IsNullOrEmpty($GroupName)) {
+        Write-Host "The Service `'$Name`' does not require a LoadOrderGroup"
+    }
+    else {
+        $GroupName
+    }
+}   
+
+Find-ServiceLoadOrderGroup
